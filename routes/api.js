@@ -1,16 +1,40 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const Project = require('../models/Project');
 const Testimonial = require('../models/Testimonial');
 const Industry = require('../models/Industry');
 const Contact = require('../models/Contact');
 const Vendor = require('../models/Vendor');
 const Setting = require('../models/Setting');
+const Admin = require('../models/Admin');
 
 function auth(req, res, next) {
-  if (req.session.isAdmin) return next();
-  res.status(401).json({ error: 'Unauthorized' });
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'No token provided' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'outset_jwt_secret');
+    req.adminId = decoded.id;
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
 }
+
+// Admin login
+router.post('/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const admin = await Admin.findOne({ email });
+    if (!admin || !(await admin.comparePassword(password))) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET || 'outset_jwt_secret', { expiresIn: '24h' });
+    res.json({ token, email: admin.email, name: admin.name });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ========== PUBLIC API (Frontend) ==========
 

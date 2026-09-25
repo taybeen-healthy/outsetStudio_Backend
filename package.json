@@ -25,10 +25,7 @@
     "cloudinary": "^2.11.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.2",
-    "ejs": "^6.0.1",
     "express": "^5.2.1",
-    "express-ejs-layouts": "^2.5.1",
-    "express-session": "^1.19.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.10.2",
     "multer": "^2.4.0"
