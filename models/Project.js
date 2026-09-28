@@ -9,10 +9,12 @@ const projectSchema = new mongoose.Schema({
   image: { type: String, required: true },
   location: { type: String, required: true },
   specs: {
-    projectName: String,
-    type: String,
-    location: String,
-    scope: String,
+    type: new mongoose.Schema({
+      projectName: String,
+      type: String,
+      location: String,
+      scope: String,
+    }, { _id: false, id: false }),
   },
   concept: {
     title: String,
@@ -58,8 +60,10 @@ const projectSchema = new mongoose.Schema({
     of: {
       image: String,
       caption: String,
+      index: String,
     },
   },
+  type: { type: String, default: '' },
   order: { type: Number, default: 0 },
   active: { type: Boolean, default: true },
 }, { timestamps: true });

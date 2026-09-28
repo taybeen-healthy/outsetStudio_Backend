@@ -40,7 +40,7 @@ router.post('/auth/login', async (req, res) => {
 
 router.get('/projects', async (req, res) => {
   try {
-    const projects = await Project.find({ active: true }).sort({ order: 1 });
+    const projects = await Project.find({ type: 'portfolio', active: { $ne: false } }).sort({ order: 1 });
     res.json(projects);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -49,7 +49,7 @@ router.get('/projects', async (req, res) => {
 
 router.get('/projects/:slug', async (req, res) => {
   try {
-    const project = await Project.findOne({ slug: req.params.slug, active: true });
+    const project = await Project.findOne({ slug: req.params.slug, type: 'portfolio', active: { $ne: false } });
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json(project);
   } catch (err) {
