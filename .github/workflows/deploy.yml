@@ -36,25 +36,28 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             export PATH=$PATH:/usr/local/bin:/usr/bin:/bin:$PATH
-            
+
             echo "=== Starting Outset Studio Backend Deploy ==="
-            cd /var/www/outsetStudio_admin
+            cd /var/www/outsetStudio_Backend
             git fetch origin main
             git reset --hard origin/main
-            
-            echo "PORT=3005" > .env
-            echo "SESSION_SECRET=outsetstudio_admin_secret_key_2024" >> .env
-            echo "ADMIN_EMAIL=admin@outsetstudio.in" >> .env
-            echo "ADMIN_PASSWORD=admin123" >> .env
-            
+
             npm ci --production
-            chmod -R 755 /var/www/outsetStudio_admin
-            
+
+            if [ ! -f .env ]; then
+              echo "PORT=3006" > .env
+              echo "JWT_SECRET=outsetstudio_jwt_secret_2024" >> .env
+              echo "ADMIN_EMAIL=admin@outsetstudio.in" >> .env
+              echo "ADMIN_PASSWORD=admin123" >> .env
+              echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+              echo "FRONTEND_URL=https://outsetstudio.in" >> .env
+            fi
+
             pm2 startup systemd -u $USER --hp $HOME 2>/dev/null || true
-            
-            pm2 delete admin-outsetstudio 2>/dev/null || true
-            pm2 start server.js --name "admin-outsetstudio"
+
+            pm2 delete outsetstudio-backend 2>/dev/null || true
+            pm2 start server.js --name "outsetstudio-backend"
             pm2 save || true
-            
+
             pm2 status
             echo "=== Outset Studio Backend Deploy Complete ==="
