@@ -105,6 +105,34 @@ router.post('/vendors', async (req, res) => {
   }
 });
 
+// Review / testimonial submission (public) — goes to admin as pending
+router.post('/testimonials', async (req, res) => {
+  try {
+    const { fullName, email, brand, completionDate, categories, rating, review, consent, files } = req.body;
+    const parts = (fullName || '').trim().split(/\s+/);
+    const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || 'CL';
+    const item = await Testimonial.create({
+      name: fullName,
+      company: brand,
+      email,
+      rating,
+      quote: review,
+      status: 'pending',
+      active: false,
+      initials,
+      project: completionDate || '—',
+      typology: (categories || []).join(', '),
+      consent: !!consent,
+      completionDate: completionDate || '',
+      categories: categories || [],
+      files: files || [],
+    });
+    res.status(201).json({ message: 'Review submitted for verification', id: item._id });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // ========== ADMIN API (CRUD) ==========
 
 // Projects
