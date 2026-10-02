@@ -59,7 +59,7 @@ router.get('/projects/:slug', async (req, res) => {
 
 router.get('/testimonials', async (req, res) => {
   try {
-    const testimonials = await Testimonial.find({ active: true }).sort({ order: 1 });
+    const testimonials = await Testimonial.find({ active: true, status: 'approved' }).sort({ order: 1 });
     res.json(testimonials);
   } catch (err) {
     res.status(500).json({ error: err.message });
